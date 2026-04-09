@@ -27,7 +27,7 @@
 
 ###
 
-<p align="left">I am Parin from India<br><br>- 🔭 I’m  a student in UAE<br>- 📚 I'm currently learning Cybersecurity (Defensive)<br>- ⚡ In my free time I like to explore and learn new stuff</p>
+<p align="left">I am Parin from India<br><br>- 🔭 I’m  a student in UAE<br>- 📚 I'm currently learning Cybersecurity (Defensive)<br>- ⚡ In my free time I like to explore and learn new stuff<br>- 🌐 Currently building my cybersecurity writeups site — documenting CTF challenges, labs, security research across platforms and my own homelab projects. Check it out <a href="https://parin070.github.io/Write-Ups/">here</a></p>
 
 ###
 
