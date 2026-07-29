@@ -1,4 +1,10 @@
-# 💫 About Me:
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg" />
+  <img alt="Parin070's GitHub profile" src="dark_mode.svg" />
+</picture>
+
+
+## 💫 About Me:
 🔭 I’m a student in UAE<br>📚 I'm currently learning Cybersecurity (Defensive)<br>⚡ In my free time I like to explore and learn new stuff<br>🌐 Currently building GhostMap — an OSINT tool aiming to simplify bug bounty and pentesting recon phase.
 
 
