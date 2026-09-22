@@ -200,12 +200,10 @@ def generate_stats_and_year(data):
     
     total = sum(days)
     
-    # year.svg - character per day
-    ramp = " .+#@"
-    year_lines = []
+    # year.svg - colored squares
     cols = 52
     rows = 7
-    chars_used = set(ramp + f"Total Contributions: {total}")
+    chars_used = set(f"Last Year Contributions ({total})")
     font_b64 = subset_font("".join(chars_used))
     
     svg = get_base_svg(620, 150, font_b64)
@@ -214,8 +212,11 @@ def generate_stats_and_year(data):
     start_x = 0
     start_y = 40
     char_width = 11
-    char_height = 14
+    char_height = 11
+    gap = 2
     
+    # GitHub colors for dark mode: #161b22 (0), #0e4429 (1), #006d32 (2), #26a641 (3), #39d353 (4)
+    colors = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"]
     max_count = max(days) if days else 1
     
     day_idx = 0
@@ -225,14 +226,16 @@ def generate_stats_and_year(data):
                 count = days[day_idx]
                 idx = 0
                 if count > 0:
-                    idx = int((count / max_count) * (len(ramp) - 2)) + 1
-                    idx = min(idx, len(ramp) - 1)
-                char = ramp[idx]
-                x = start_x + (c * char_width)
-                y = start_y + (r * char_height)
-                color_class = "accent" if count > 0 else "text"
-                opacity = 1.0 if count > 0 else 0.3
-                svg += f'  <text x="{x}" y="{y}" font-size="12" class="{color_class}" opacity="{opacity}">{char}</text>\n'
+                    normalized = count / max_count
+                    if normalized <= 0.25: idx = 1
+                    elif normalized <= 0.5: idx = 2
+                    elif normalized <= 0.75: idx = 3
+                    else: idx = 4
+                
+                color = colors[idx]
+                x = start_x + (c * (char_width + gap))
+                y = start_y + (r * (char_height + gap))
+                svg += f'  <rect x="{x}" y="{y}" width="{char_width}" height="{char_height}" fill="{color}" rx="2"/>\n'
                 day_idx += 1
                 
     svg += "</svg>"
@@ -270,13 +273,26 @@ def generate_stats_and_year(data):
     svg2 += "</svg>"
     with open("../stats.svg", "w", encoding="utf-8") as f:
         f.write(svg2)
+    return days
 
-def generate_streak():
+def generate_streak(days):
     print("Generating streak.svg...")
-    font_b64 = subset_font("Streak 42 days (mock)")
+    
+    streak = 0
+    if days:
+        recent = list(reversed(days))
+        if len(recent) > 0 and recent[0] == 0:
+            recent = recent[1:] # ignore today if it's 0, it might just be early
+        for count in recent:
+            if count > 0:
+                streak += 1
+            else:
+                break
+                
+    font_b64 = subset_font(f"Current Streak {streak} days")
     svg = get_base_svg(200, 150, font_b64)
     svg += '  <text x="100" y="50" font-size="14" class="text" text-anchor="middle">Current Streak</text>\n'
-    svg += '  <text x="100" y="90" font-size="32" class="accent" text-anchor="middle" font-weight="bold">42</text>\n'
+    svg += f'  <text x="100" y="90" font-size="32" class="accent" text-anchor="middle" font-weight="bold">{streak}</text>\n'
     svg += '  <text x="100" y="120" font-size="12" class="text" text-anchor="middle" opacity="0.7">days</text>\n'
     svg += "</svg>"
     with open("../streak.svg", "w", encoding="utf-8") as f:
@@ -313,8 +329,8 @@ if __name__ == "__main__":
     generate_ascii("../headshot.png")
     
     data = fetch_github_data()
-    generate_stats_and_year(data)
-    generate_streak()
+    days = generate_stats_and_year(data)
+    generate_streak(days)
     generate_langs()
     
     print("All SVGs generated successfully.")

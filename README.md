@@ -13,7 +13,7 @@
 
 <img src="./hd-stack.svg" alt="Stack" width="620" />
 
-<samp>linux &nbsp; python &nbsp; c/c++ &nbsp; bash &nbsp; wireshark &nbsp; docker &nbsp; git</samp>
+<samp>linux &nbsp; wireshark &nbsp; kali-linux &nbsp; docker &nbsp; bash &nbsp; git &nbsp; tor &nbsp; python &nbsp; c++ &nbsp; c &nbsp; java &nbsp; mysql &nbsp; mongodb &nbsp; html5 &nbsp; css3 &nbsp; markdown &nbsp; netlify &nbsp; vercel &nbsp; apache &nbsp; pandas &nbsp; numpy &nbsp; matplotlib &nbsp; windows-terminal</samp>
 
 <img src="./hd-projects.svg" alt="Projects" width="620" />
 
@@ -33,7 +33,10 @@ CTF writeups site.
   <img src="./year.svg" alt="Year Activity" />
 </div>
 
----
-<div align="center">
-  <sub>This page is self-generated every 24 hours. No third-party servers, no iframes. SVGs are built via GitHub Actions and inline subsetted JetBrains Mono fonts.</sub>
-</div>
+Every graphic here is generated, not embedded from anyone else's server. ascii.svg is a photo pushed through a character ramp by [scripts/build.py](https://github.com/Parin070/Parin070/blob/main/scripts/build.py); the stat graphics and these section headings are drawn by [a scheduled action](https://github.com/Parin070/Parin070/blob/main/.github/workflows/stats.yml) straight from the GitHub GraphQL API, once a day, committing only what changed.
+
+They animate with SMIL inside the SVG, because GitHub strips scripts from READMEs — and since nothing loads from a third party, nothing here can rate-limit or go dark. The headings are SVGs for the same reason: GitHub also strips CSS, so an image is the only way to put this page's own typeface on them.
+
+The typeface is [JetBrains Mono](https://github.com/Parin070/Parin070/tree/main/scripts), subset to just the characters each graphic draws and inlined as base64. That isn't only for looks: the portrait's grid assumes an advance width of exactly 0.600 em, and a viewer whose default monospace is narrower would otherwise see it squeezed.
+
+Language totals cover public repositories only. year.svg renders native colored heatmap blocks for contribution intensity.
