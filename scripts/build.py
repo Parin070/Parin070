@@ -375,8 +375,8 @@ def draw_year(s):
     pad_l, pad_t = LEFT, 44
     weeks = s["weeks"]
     
-    char_width = 11
-    char_height = 11
+    char_width = 9
+    char_height = 9
     gap = 2
     LH = char_height + gap
     

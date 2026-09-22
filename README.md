@@ -17,13 +17,13 @@
 
 <img src="./hd-projects.svg?v=2" alt="Projects" width="620" />
 
-**[GhostMap](https://github.com/Parin070/GhostMap)** &nbsp;·&nbsp; <samp>osint, cli</samp><br>
+### [GhostMap](https://github.com/Parin070/GhostMap) &nbsp;·&nbsp; <samp>osint, cli</samp>
 OSINT CLI tool aiming to simplify bug bounty and pentesting recon phase.
 
-**[Cowrie honeypot](https://github.com/Parin070/Cowrie)** &nbsp;·&nbsp; <samp>honeypot, defense</samp><br>
+### [Cowrie honeypot](https://github.com/Parin070/Cowrie) &nbsp;·&nbsp; <samp>honeypot, defense</samp>
 Homelab attack-defend setup using the Cowrie SSH/Telnet honeypot.
 
-**[VAULT](https://github.com/Parin070/VAULT)** &nbsp;·&nbsp; <samp>ctf, writeups</samp><br>
+### [VAULT](https://github.com/Parin070/VAULT) &nbsp;·&nbsp; <samp>ctf, writeups</samp>
 CTF writeups site.
 
 <img src="./hd-stats.svg?v=2" alt="Stats" width="620" />
