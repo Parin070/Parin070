@@ -1,30 +1,39 @@
-# 💫 About Me:
-🔭 I’m a student in UAE<br>📚 I'm currently learning Cybersecurity (Defensive)<br>⚡ In my free time I like to explore and learn new stuff<br>🌐 Currently building GhostMap — an OSINT tool aiming to simplify bug bounty and pentesting recon phase.
+<div align="center">
+  <img src="./ascii.svg" alt="ASCII Portrait" width="460" />
+  <img src="./stats.svg" alt="Contributions" width="620" />
+  
+  [Website](https://parin-arora.vercel.app) · [GitHub](https://github.com/Parin070) · [LinkedIn](https://www.linkedin.com/in/parinarora) · [Email](mailto:parin.arora33@gmail.com)
+</div>
 
+<img src="./hd-about.svg" alt="About" width="620" />
 
-## 🌐 Socials:
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/parinarora) [![email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](mailto:parin.arora33@gmail.com) 
+> Third-year B.E. Computer Science student at BITS Pilani Dubai Campus, based in Dubai.<br>
+> Interested in SOC/Blue Team work short-term, AI security (purple teaming) as long-term direction, and binary exploitation/pwn as a long game.<br>
+> Currently building CS Head role at IEI BPDC Student Chapter Council and VP of LUG BITS Dubai.
 
-# 💻 Tech Stack:
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) ![Wireshark](https://img.shields.io/badge/Wireshark-1679A7?style=for-the-badge&logo=wireshark&logoColor=white) ![Kali Linux](https://img.shields.io/badge/Kali%20Linux-557C94?style=for-the-badge&logo=kali-linux&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white) ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white) ![TOR](https://img.shields.io/badge/tor-%237E4798.svg?style=for-the-badge&logo=tor-project&logoColor=white)
+<img src="./hd-stack.svg" alt="Stack" width="620" />
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white) ![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white) ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white) ![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+<samp>linux &nbsp; python &nbsp; c/c++ &nbsp; bash &nbsp; wireshark &nbsp; docker &nbsp; git</samp>
 
-![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![Markdown](https://img.shields.io/badge/markdown-%23000000.svg?style=for-the-badge&logo=markdown&logoColor=white) ![Netlify](https://img.shields.io/badge/netlify-%23000000.svg?style=for-the-badge&logo=netlify&logoColor=#00C7B7) ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white) ![Apache](https://img.shields.io/badge/apache-%23D42029.svg?style=for-the-badge&logo=apache&logoColor=white)
+<img src="./hd-projects.svg" alt="Projects" width="620" />
 
-![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) ![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black) ![Windows Terminal](https://img.shields.io/badge/Windows%20Terminal-%234D4D4D.svg?style=for-the-badge&logo=windows-terminal&logoColor=white) ![AMD](https://img.shields.io/badge/AMD-%23000000.svg?style=for-the-badge&logo=amd&logoColor=white)
-# 📊 GitHub Stats:
-![](https://github-readme-stats.shion.dev/api?username=Parin070&theme=dark&hide_border=false&include_all_commits=false&count_private=false)<br/>
-![](https://streak-stats.demolab.com/?user=Parin070&theme=dark&hide_border=false)<br/>
-![](https://github-readme-stats.shion.dev/api/top-langs/?username=Parin070&theme=dark&hide_border=false&include_all_commits=false&count_private=false&layout=compact)
+**[GhostMap](https://github.com/Parin070/GhostMap)** &nbsp;·&nbsp; <samp>osint, cli</samp><br>
+OSINT CLI tool aiming to simplify bug bounty and pentesting recon phase.
 
-## 🏆 GitHub Trophies
-![](https://github-profile-trophy.vercel.app/?username=Parin070&theme=radical&no-frame=false&no-bg=false&margin-w=4)
+**[Cowrie honeypot](https://github.com/Parin070/Cowrie)** &nbsp;·&nbsp; <samp>honeypot, defense</samp><br>
+Homelab attack-defend setup using the Cowrie SSH/Telnet honeypot.
 
-### 🔝 Top Contributed Repo
-![](https://github-contributor-stats.vercel.app/api?username=Parin070&limit=5&theme=dark&combine_all_yearly_contributions=true)
+**[VAULT](https://github.com/Parin070/VAULT)** &nbsp;·&nbsp; <samp>ctf, writeups</samp><br>
+CTF writeups site.
+
+<img src="./hd-stats.svg" alt="Stats" width="620" />
+<div align="center">
+  <img src="./streak.svg" alt="Streak" />
+  <img src="./langs.svg" alt="Languages" />
+  <img src="./year.svg" alt="Year Activity" />
+</div>
 
 ---
-[![](https://komarev.com/ghpvc/?username=Parin070&color=blue)](https://visitcount.itsvg.in)
-
-<!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
+<div align="center">
+  <sub>This page is self-generated every 24 hours. No third-party servers, no iframes. SVGs are built via GitHub Actions and inline subsetted JetBrains Mono fonts.</sub>
+</div>
