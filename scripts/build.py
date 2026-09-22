@@ -1,11 +1,15 @@
+#!/usr/bin/env python3
+"""Draw the profile README's stat graphics from the GitHub GraphQL API."""
+import base64
+import functools
+import json
 import os
 import sys
-import base64
-import requests
+import urllib.request
+from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
-from PIL import Image, ImageDraw
 
-# Try to import fonttools, warn if missing but continue
+# Try to import fonttools
 try:
     from fontTools import subset
     from fontTools.ttLib import TTFont
@@ -13,31 +17,53 @@ except ImportError:
     subset = None
     print("Warning: fonttools not installed, font subsetting will be skipped.")
 
-GITHUB_TOKEN = os.getenv("GH_PAT")
-USERNAME = "Parin070"
+API = "https://api.github.com/graphql"
 
-# Colors and configuration
-BG_COLOR = "transparent"
-TEXT_COLOR = "#c9d1d9"
-ACCENT_COLOR = "#58a6ff"
+QUERY = """
+query($login: String!, $from: DateTime!, $to: DateTime!) {
+  user(login: $login) {
+    contributionsCollection(from: $from, to: $to) {
+      contributionCalendar {
+        totalContributions
+        weeks { contributionDays { contributionCount date weekday } }
+      }
+    }
+    repositories(first: 100, ownerAffiliations: OWNER, isFork: false,
+                 privacy: PUBLIC) {
+      nodes {
+        languages(first: 12, orderBy: {field: SIZE, direction: DESC}) {
+          edges { size node { name } }
+        }
+      }
+    }
+  }
+}
+"""
+
+LIGHT = dict(data="#6e7681", emph="#424a53", dim="#8c959f",
+             rule="#d8dee4", surface="#ffffff")
+DARK = dict(data="#c9d1d9", emph="#f0f6fc", dim="#8b949e",
+            rule="#30363d", surface="#0d1117")
+
+MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/raw/master/fonts/ttf/JetBrainsMono-Regular.ttf"
 FONT_PATH = "JetBrainsMono-Regular.ttf"
 
 def download_font():
     if not os.path.exists(FONT_PATH):
         print("Downloading JetBrains Mono...")
-        r = requests.get(FONT_URL)
-        with open(FONT_PATH, 'wb') as f:
-            f.write(r.content)
+        req = urllib.request.Request(FONT_URL, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            with open(FONT_PATH, 'wb') as f:
+                f.write(response.read())
 
+@functools.lru_cache(maxsize=None)
 def subset_font(text):
+    download_font()
     if not subset or not os.path.exists(FONT_PATH):
         return ""
     
     unique_chars = "".join(set(text))
-    # We use a temporary file for the subsetted font
-    subset_path = "subset.ttf"
-    
     options = subset.Options()
     options.flavor = "woff2"
     
@@ -54,283 +80,419 @@ def subset_font(text):
     
     return f"data:font/woff2;charset=utf-8;base64,{b64}"
 
-def get_base_svg(width, height, font_b64, extra_css=""):
-    return f"""<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @font-face {{
-      font-family: 'JetBrains Mono';
-      src: url('{font_b64}') format('woff2');
-      font-weight: normal;
-      font-style: normal;
-    }}
-    .text {{
-      font-family: 'JetBrains Mono', monospace;
-      fill: {TEXT_COLOR};
-    }}
-    .accent {{
-      fill: {ACCENT_COLOR};
-    }}
-    {extra_css}
-    @media (prefers-color-scheme: light) {{
-        .text {{ fill: #24292e; }}
-        .accent {{ fill: #0969da; }}
-    }}
-  </style>
-"""
+def font_text():
+    # Gather a robust subset for standard graphics
+    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%-,. ()"
+    b64 = subset_font(charset)
+    return (f"@font-face{{font-family:'JetBrains Mono';font-style:normal;"
+            f"font-weight:400;font-display:block;"
+            f"src:url({b64}) format('woff2')}}")
 
-def generate_header(filename, text, width=620, height=40):
-    print(f"Generating {filename}...")
-    font_b64 = subset_font(text)
-    svg = get_base_svg(width, height, font_b64)
-    # 20px font, vertically centered
-    svg += f'  <text x="0" y="28" font-size="20" class="text accent" font-weight="bold">{text}</text>\n'
-    svg += "</svg>"
-    
-    with open(f"../{filename}", "w", encoding="utf-8") as f:
-        f.write(svg)
+def font_head(word):
+    b64 = subset_font(word)
+    return (f"@font-face{{font-family:'JetBrains Mono';font-style:normal;"
+            f"font-weight:600;font-display:block;"
+            f"src:url({b64}) format('woff2')}}")
 
-def generate_ascii(image_path="headshot.jpg"):
-    print("Generating ascii.svg...")
-    if not os.path.exists(image_path):
-        print(f"Image {image_path} not found, skipping ASCII generation.")
-        # Create a placeholder
-        font_b64 = subset_font("PLACEHOLDER")
-        svg = get_base_svg(460, 460, font_b64)
-        svg += '  <rect width="460" height="460" fill="#161b22" rx="10"/>\n'
-        svg += f'  <text x="230" y="230" font-size="24" class="text" text-anchor="middle">Missing {image_path}</text>\n'
-        svg += "</svg>"
-        with open("../ascii.svg", "w", encoding="utf-8") as f:
-            f.write(svg)
-        return
+WIDTH = 620
+LEFT = 34
+REVEAL = 1.30
+MON = ["jan", "feb", "mar", "apr", "may", "jun",
+       "jul", "aug", "sep", "oct", "nov", "dec"]
 
-    # Character ramp from dark to light
-    ramp = " .:+*?%S#@"
-    
-    img = Image.open(image_path).convert("L")
-    # Resize to fit grid, roughly 50x50 characters
-    cols = 55
-    # Font aspect ratio compensation (characters are taller than they are wide)
-    char_aspect = 0.5
-    w, h = img.size
-    rows = int((h / w) * cols * char_aspect)
-    
-    img = img.resize((cols, rows), Image.Resampling.LANCZOS)
-    pixels = img.load()
-    
-    lines = []
-    unique_chars = set()
-    for y in range(rows):
-        line = ""
-        for x in range(cols):
-            val = pixels[x, y]
-            idx = int((val / 255.0) * (len(ramp) - 1))
-            char = ramp[idx]
-            line += char
-            unique_chars.add(char)
-        lines.append(line)
+# ---------------------------------------------------------------- data
+
+def window():
+    today = datetime.now(timezone.utc).date()
+    start = today - timedelta(days=364)
+    return (f"{start.isoformat()}T00:00:00Z", f"{today.isoformat()}T23:59:59Z")
+
+
+def fetch(login, token):
+    if not token:
+        print("Warning: GH_PAT is not set. Creating mock data.")
+        return mock_data()
         
-    font_b64 = subset_font("".join(unique_chars) + " ")
-    
-    width = 460
-    height = 460
-    
-    # 8px font size, 10px line height
-    font_size = 9
-    line_height = 10
-    start_y = (height - (rows * line_height)) // 2 + font_size
-    
-    svg = get_base_svg(width, height, font_b64)
-    # Adding a subtle background for the ascii
-    svg += '  <rect width="460" height="460" fill="transparent" rx="10"/>\n'
-    
-    for i, line in enumerate(lines):
-        y = start_y + (i * line_height)
-        # Using xml:space="preserve" to keep whitespace
-        svg += f'  <text x="20" y="{y}" font-size="{font_size}" class="text" xml:space="preserve">{line}</text>\n'
-        
-    svg += "</svg>"
-    with open("../ascii.svg", "w", encoding="utf-8") as f:
-        f.write(svg)
+    since, until = window()
+    body = json.dumps({"query": QUERY,
+                       "variables": {"login": login,
+                                     "from": since, "to": until}}).encode()
+    req = urllib.request.Request(
+        API, data=body,
+        headers={"Authorization": f"bearer {token}",
+                 "Content-Type": "application/json",
+                 "User-Agent": f"{login}-profile-stats"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        payload = json.load(r)
+    if "errors" in payload:
+        raise SystemExit(f"GraphQL errors: {payload['errors']}")
+    user = (payload.get("data") or {}).get("user")
+    if not user:
+        raise SystemExit(f"no such user: {login}")
+    return user
 
-def fetch_github_data():
-    if not GITHUB_TOKEN:
-        print("GH_TOKEN not set, returning mock data.")
-        return {"contributions": []}
-    
-    headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
-    query = """
-    {
-      user(login: "%s") {
-        contributionsCollection {
-          contributionCalendar {
-            totalContributions
-            weeks {
-              contributionDays {
-                contributionCount
-                date
-              }
+def mock_data():
+    return {
+        "contributionsCollection": {
+            "contributionCalendar": {
+                "totalContributions": 1337,
+                "weeks": [{"contributionDays": [{"contributionCount": 5, "date": "2026-01-01", "weekday": d}]} for w in range(53) for d in range(7)]
             }
-          }
+        },
+        "repositories": {
+            "nodes": [
+                {"languages": {"edges": [{"size": 1000, "node": {"name": "Python"}}]}}
+            ]
         }
-      }
     }
-    """ % USERNAME
-    
-    r = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
-    if r.status_code == 200:
-        return r.json()
-    else:
-        print("Failed to fetch data:", r.text)
-        return None
 
-def generate_stats_and_year(data):
-    print("Generating stats.svg and year.svg...")
+
+def pretty(iso):
+    d = date.fromisoformat(iso[:10])
+    return f"{MON[d.month - 1]} {d.day}"
+
+
+def streaks(days):
+    best = dict(length=0, start=None, end=None)
+    run, run_start = 0, None
+    for d in days:
+        if d["contributionCount"] > 0:
+            run += 1
+            run_start = run_start or d["date"]
+            if run > best["length"]:
+                best = dict(length=run, start=run_start, end=d["date"])
+        else:
+            run, run_start = 0, None
+
+    cur = dict(length=0, start=None, end=None)
+    tail = days[:-1] if days and days[-1]["contributionCount"] == 0 else days
+    for d in reversed(tail):
+        if d["contributionCount"] == 0:
+            break
+        cur["length"] += 1
+        cur["start"] = d["date"]
+        cur["end"] = cur["end"] or d["date"]
+    return cur, best
+
+
+def languages(repos):
+    by_size, by_repo = {}, {}
+    for node in repos:
+        edges = (node.get("languages") or {}).get("edges") or []
+        for e in edges:
+            name = e["node"]["name"]
+            by_size[name] = by_size.get(name, 0) + e["size"]
+        if edges:                       # primary language of the repo
+            top = edges[0]["node"]["name"]
+            by_repo[top] = by_repo.get(top, 0) + 1
+
+    def rank(d):
+        return sorted(d.items(), key=lambda kv: (-kv[1], kv[0]))[:5]
+
+    return rank(by_size), rank(by_repo)
+
+
+def summarise(user):
+    cal = user["contributionsCollection"]["contributionCalendar"]
+    weeks = [w["contributionDays"] for w in cal["weeks"]]
+    days = [d for w in weeks for d in w]
+    weekly = [sum(d["contributionCount"] for d in w) for w in weeks]
+    cur, best = streaks(days)
+    by_size, by_repo = languages(user["repositories"]["nodes"])
+    return dict(
+        total=cal["totalContributions"],
+        active=sum(1 for d in days if d["contributionCount"] > 0),
+        best_week=max(weekly) if weekly else 0,
+        weekly=weekly, weeks=weeks,
+        current=cur, longest=best,
+        by_size=by_size, by_repo=by_repo)
+
+
+# ---------------------------------------------------------------- drawing
+
+def style(extra="", font=None):
+    def block(t):
+        return (f".d-f{{fill:{t['data']}}}.d-s{{stroke:{t['data']}}}"
+                f".e-f{{fill:{t['emph']}}}.m-f{{fill:{t['dim']}}}"
+                f".u-s{{stroke:{t['rule']}}}.r{{stroke:{t['surface']}}}")
+    return (f"<style>{font or font_text()}"
+            f"{block(LIGHT)}.w{{fill:{LIGHT['data']};opacity:.13}}{extra}"
+            f"@media(prefers-color-scheme:dark){{{block(DARK)}"
+            f".w{{fill:{DARK['data']};opacity:.16}}}}</style>")
+
+
+def head(w, h, font=None):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+            f'viewBox="0 0 {w} {h}" fill="none" font-family="{MONO}">'
+            + style(font=font))
+
+
+def fade(delay, dur=0.45):
+    return (f'<animate attributeName="opacity" from="0" to="1" '
+            f'begin="{delay:.2f}s" dur="{dur}s" fill="freeze"/>')
+
+
+def wipe(cid, x, y, w, h, delay, dur=REVEAL):
+    clip = (f'<clipPath id="{cid}"><rect x="{x}" y="{y}" height="{h}" width="0">'
+            f'<animate attributeName="width" from="0" to="{w}" '
+            f'begin="{delay:.2f}s" dur="{dur}s" fill="freeze"/></rect></clipPath>')
+    cursor = (f'<rect y="{y}" width="2" height="{h}" class="d-f" opacity="0">'
+              f'<animate attributeName="x" from="{x}" to="{x + w}" '
+              f'begin="{delay:.2f}s" dur="{dur}s" fill="freeze"/>'
+              f'<set attributeName="opacity" to="0.55" begin="{delay:.2f}s"/>'
+              f'<set attributeName="opacity" to="0" '
+              f'begin="{delay + dur:.2f}s"/></rect>')
+    return clip, cursor
+
+
+def label(x, y, text, size=11, cls="m-f", anchor="start", extra=""):
+    a = f' text-anchor="{anchor}"' if anchor != "start" else ""
+    return (f'<text x="{x}" y="{y}" class="{cls}" font-size="{size}"{a}'
+            f'{extra}>{text}</text>')
+
+
+def hbar(x, y, w, h, cls="d-f", r=3.0):
+    if w <= 0.6:
+        return ""
+    r = min(r, h / 2.0, w)
+    return (f'<path d="M{x:.1f} {y:.1f}H{x + w - r:.1f}'
+            f'Q{x + w:.1f} {y:.1f} {x + w:.1f} {y + r:.1f}'
+            f'V{y + h - r:.1f}Q{x + w:.1f} {y + h:.1f} {x + w - r:.1f} {y + h:.1f}'
+            f'H{x:.1f}Z" class="{cls}"/>')
+
+
+def draw_stats(s):
+    H = 148
+    weekly = s["weekly"] or [0]
+    peak = max(weekly) or 1
+    p = [head(WIDTH, H)]
+    p.append(f'<g opacity="0">{fade(0.10)}'
+             + label(0, 50, s["total"], 52, "e-f", extra=' font-weight="600"')
+             + label(0, 72, "contributions in the last year", 12) + '</g>')
+    for i, (val, lab) in enumerate([(s["active"], "active days"),
+                                    (s["best_week"], "best week")]):
+        p.append(f'<g opacity="0">{fade(0.30 + i * 0.12)}'
+                 + label(WIDTH, 30 + i * 40, val, 19, "e-f", "end",
+                         ' font-weight="600"')
+                 + label(WIDTH, 47 + i * 40, lab, 11, "m-f", "end") + '</g>')
+
+    base, top = H - 10, H - 58
+    span = base - top
+    step = WIDTH / max(len(weekly) - 1, 1)
+    pts = [(i * step, base - (v / peak) * span) for i, v in enumerate(weekly)]
+    clip, cursor = wipe("rs", 0, top - 6, WIDTH, span + 8, 0.50)
+    p.append(clip)
+    p.append('<g clip-path="url(#rs)">')
+    p.append(f'<path d="M{pts[0][0]:.1f} {base:.1f}'
+             + "".join(f'L{x:.1f} {y:.1f}' for x, y in pts)
+             + f'L{pts[-1][0]:.1f} {base:.1f}Z" class="w"/>')
+    p.append(f'<path d="M{pts[0][0]:.1f} {pts[0][1]:.1f}'
+             + "".join(f'L{x:.1f} {y:.1f}' for x, y in pts[1:])
+             + f'" class="d-s" stroke-width="2" stroke-linejoin="round" '
+             f'stroke-linecap="round"/>')
+    p.append("</g>")
+    p.append(cursor)
+    ex, ey = pts[-1]
+    p.append(f'<circle cx="{ex - 2:.1f}" cy="{ey:.1f}" r="4.5" class="e-f r" '
+             f'stroke-width="2" opacity="0">{fade(0.50 + REVEAL, 0.35)}</circle>')
+    p.append("</svg>")
+    return "".join(p)
+
+
+def draw_streak(s):
+    H = 96
+    cells = []
+    for k, lab in (("current", "current streak"), ("longest", "longest streak")):
+        r = s[k]
+        span = (f"{pretty(r['start'])} &#8211; {pretty(r['end'])}"
+                if r["length"] else "&#8212;")
+        cells.append((r["length"], lab, span))
+
+    p = [head(WIDTH, H)]
+    mid = WIDTH / 2
+    p.append(f'<line x1="{mid:.0f}" y1="16" x2="{mid:.0f}" y2="80" '
+             f'class="u-s" stroke-width="1" opacity="0">{fade(0.20)}</line>')
+    for i, (val, lab, span) in enumerate(cells):
+        x = LEFT if i == 0 else mid + LEFT
+        p.append(f'<g opacity="0">{fade(0.12 + i * 0.14)}'
+                 + label(x, 44, f"{val}", 34, "e-f", extra=' font-weight="600"')
+                 + label(x, 64, lab, 11)
+                 + label(x, 80, span, 10) + '</g>')
+    p.append("</svg>")
+    return "".join(p)
+
+
+def draw_langs(s):
+    rows = max(len(s["by_size"]), len(s["by_repo"]), 1)
+    H = 26 + rows * 22 + 6
+    colw = (WIDTH - LEFT - 30) / 2
+    name_w, bar_max = 82, colw - 82 - 44
+
+    p = [head(WIDTH, H)]
+    groups = [(LEFT, "by bytes", s["by_size"], True),
+              (LEFT + colw + 30, "by repos", s["by_repo"], False)]
+    for gi, (gx, title, data, as_pct) in enumerate(groups):
+        p.append(f'<g opacity="0">{fade(0.10 + gi * 0.10)}'
+                 + label(gx, 12, title.upper(), 9, "m-f",
+                         extra=' letter-spacing="1.3"') + '</g>')
+        if not data:
+            continue
+        top = max(v for _, v in data) or 1
+        total = sum(v for _, v in data) or 1
+        cid = f"rl{gi}"
+        clip, cursor = wipe(cid, gx + name_w, 20, bar_max, rows * 22,
+                            0.34 + gi * 0.12, 0.95)
+        p.append(clip)
+        for ri, (name, val) in enumerate(data):
+            y = 26 + ri * 22
+            shown = (f"{val / total * 100:.0f}%" if as_pct else f"{val}")
+            p.append(f'<g opacity="0">{fade(0.24 + gi * 0.10 + ri * 0.05)}'
+                     + label(gx, y + 8, name.lower()[:11], 11, "e-f")
+                     + label(gx + colw - 6, y + 8, shown, 11, "m-f", "end")
+                     + '</g>')
+            p.append(f'<g clip-path="url(#{cid})">'
+                     + hbar(gx + name_w, y, bar_max * val / top, 7)
+                     + '</g>')
+        p.append(cursor)
+    p.append("</svg>")
+    return "".join(p)
+
+
+def draw_heading(word):
+    FS = 16
+    H = 26
+    text_end = len(word) * FS * 0.6 + 18
+    p = [head(WIDTH, H, font=font_head(word))]
+    p.append(label(0, 18, word, FS, "e-f", extra=' font-weight="600"'))
+    p.append(f'<line x1="{text_end:.0f}" y1="12.5" x2="{WIDTH}" y2="12.5" '
+             f'class="u-s" stroke-width="1"/>')
+    p.append("</svg>")
+    return "".join(p)
+
+
+def draw_year(s):
+    """Seven rows by fifty-three weeks, intensity as a heatmap block."""
+    pad_l, pad_t = LEFT, 44
+    weeks = s["weeks"]
     
-    # Mock data if API fails or no token
-    days = []
-    if data and "data" in data and data["data"]["user"]:
-        weeks = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
-        for week in weeks:
-            for day in week["contributionDays"]:
-                days.append(day["contributionCount"])
-    else:
-        # Generate 365 days of random data
-        import random
-        days = [random.randint(0, 10) for _ in range(365)]
-    
-    total = sum(days)
-    
-    # year.svg - colored squares
-    cols = 52
-    rows = 7
-    chars_used = set(f"Last Year Contributions ({total})")
-    font_b64 = subset_font("".join(chars_used))
-    
-    svg = get_base_svg(620, 150, font_b64)
-    svg += f'  <text x="0" y="20" font-size="14" class="text">Last Year Contributions ({total})</text>\n'
-    
-    start_x = 0
-    start_y = 40
     char_width = 11
     char_height = 11
     gap = 2
+    LH = char_height + gap
     
-    # GitHub colors for dark mode: #161b22 (0), #0e4429 (1), #006d32 (2), #26a641 (3), #39d353 (4)
+    H = int(pad_t + 7 * LH + 26)
+    
     colors = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"]
-    max_count = max(days) if days else 1
-    
-    day_idx = 0
-    for c in range(cols):
-        for r in range(rows):
-            if day_idx < len(days):
-                count = days[day_idx]
+    max_count = 1
+    for w in weeks:
+        for d in w:
+            if d.get("contributionCount", 0) > max_count:
+                max_count = d["contributionCount"]
+
+    p = [head(WIDTH, H)]
+    p.append(f'<g opacity="0">{fade(0.10)}'
+             + label(pad_l, 16, "THE YEAR", 9, "m-f",
+                     extra=' letter-spacing="1.3"')
+             + label(pad_l, 32, f"{s['active']} of "
+                     f"{sum(len(w) for w in weeks)} days had a contribution", 11)
+             + '</g>')
+
+    lx = WIDTH - 6
+    p.append(f'<g opacity="0">{fade(1.30)}'
+             + label(lx - 78, 32, "less", 9, "m-f", "end"))
+    for i, color in enumerate(colors):
+        p.append(f'<rect x="{lx - 72 + i*(char_width+gap)}" y="{32-char_height+2}" width="{char_width}" height="{char_height}" fill="{color}" rx="2"/>')
+    p.append(label(lx, 32, "more", 9, "m-f", "end") + '</g>')
+
+    for r in range(7):
+        rects = []
+        for i, w in enumerate(weeks):
+            day = next((d for d in w if d.get("weekday") == r), None)
+            v = day["contributionCount"] if day else 0
+            if v == 0:
                 idx = 0
-                if count > 0:
-                    normalized = count / max_count
-                    if normalized <= 0.25: idx = 1
-                    elif normalized <= 0.5: idx = 2
-                    elif normalized <= 0.75: idx = 3
-                    else: idx = 4
-                
-                color = colors[idx]
-                x = start_x + (c * (char_width + gap))
-                y = start_y + (r * (char_height + gap))
-                svg += f'  <rect x="{x}" y="{y}" width="{char_width}" height="{char_height}" fill="{color}" rx="2"/>\n'
-                day_idx += 1
-                
-    svg += "</svg>"
-    with open("../year.svg", "w", encoding="utf-8") as f:
-        f.write(svg)
-
-    # stats.svg - simple bar chart or sparkline
-    # For a monospace aesthetic, let's make it a line graph
-    font_b64 = subset_font(f"Activity Graph {total} contributions")
-    svg2 = get_base_svg(620, 150, font_b64, extra_css=".line { stroke: #58a6ff; stroke-width: 2; fill: none; }")
-    svg2 += f'  <text x="0" y="20" font-size="14" class="text">Activity</text>\n'
-    
-    # Simple line graph of weekly contributions
-    weekly = [sum(days[i:i+7]) for i in range(0, len(days), 7)]
-    max_weekly = max(weekly) if weekly else 1
-    
-    points = []
-    for i, val in enumerate(weekly):
-        x = (i / len(weekly)) * 620
-        y = 140 - ((val / max_weekly) * 100)
-        points.append(f"{x},{y}")
-        
-    pts_str = " ".join(points)
-    svg2 += f'  <polyline points="{pts_str}" class="line"/>\n'
-    # Add a little animation
-    svg2 += f"""  <path d="M0,140 L{pts_str} L620,140 Z" fill="url(#grad)" opacity="0.2">
-    <animate attributeName="opacity" values="0.1;0.3;0.1" dur="4s" repeatCount="indefinite" />
-  </path>
-  <defs>
-    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="{ACCENT_COLOR}"/>
-      <stop offset="100%" stop-color="{ACCENT_COLOR}" stop-opacity="0"/>
-    </linearGradient>
-  </defs>"""
-    svg2 += "</svg>"
-    with open("../stats.svg", "w", encoding="utf-8") as f:
-        f.write(svg2)
-    return days
-
-def generate_streak(days):
-    print("Generating streak.svg...")
-    
-    streak = 0
-    if days:
-        recent = list(reversed(days))
-        if len(recent) > 0 and recent[0] == 0:
-            recent = recent[1:] # ignore today if it's 0, it might just be early
-        for count in recent:
-            if count > 0:
-                streak += 1
             else:
-                break
-                
-    font_b64 = subset_font(f"Current Streak {streak} days")
-    svg = get_base_svg(200, 150, font_b64)
-    svg += '  <text x="100" y="50" font-size="14" class="text" text-anchor="middle">Current Streak</text>\n'
-    svg += f'  <text x="100" y="90" font-size="32" class="accent" text-anchor="middle" font-weight="bold">{streak}</text>\n'
-    svg += '  <text x="100" y="120" font-size="12" class="text" text-anchor="middle" opacity="0.7">days</text>\n'
-    svg += "</svg>"
-    with open("../streak.svg", "w", encoding="utf-8") as f:
-        f.write(svg)
-
-def generate_langs():
-    print("Generating langs.svg...")
-    font_b64 = subset_font("Top Languages Python C++ Bash OSINT")
-    svg = get_base_svg(200, 150, font_b64)
-    svg += '  <text x="10" y="30" font-size="14" class="text">Top Languages</text>\n'
-    
-    langs = [("Python", 45), ("C++", 30), ("Bash", 15), ("Other", 10)]
-    y = 60
-    for name, pct in langs:
-        svg += f'  <text x="10" y="{y}" font-size="12" class="text">{name}</text>\n'
-        svg += f'  <rect x="80" y="{y-10}" width="{pct}" height="10" fill="{ACCENT_COLOR}" rx="2"/>\n'
-        svg += f'  <text x="{85+pct}" y="{y}" font-size="10" class="text" opacity="0.7">{pct}%</text>\n'
-        y += 20
+                normalized = v / max_count
+                if normalized <= 0.25: idx = 1
+                elif normalized <= 0.5: idx = 2
+                elif normalized <= 0.75: idx = 3
+                else: idx = 4
+            
+            x_pos = pad_l + i * (char_width + gap)
+            rects.append(f'<rect x="{x_pos}" y="{pad_t + r * LH}" width="{char_width}" height="{char_height}" fill="{colors[idx]}" rx="2"/>')
         
-    svg += "</svg>"
-    with open("../langs.svg", "w", encoding="utf-8") as f:
+        line = "".join(rects)
+        if not line:
+            continue
+        
+        y = pad_t + r * LH
+        w_px = len(weeks) * (char_width + gap)
+        cid = f"ry{r}"
+        delay = 0.30 + r * 0.07
+        p.append(f'<clipPath id="{cid}"><rect x="{pad_l}" y="{y}" '
+                 f'height="{LH}" width="0"><animate attributeName="width" '
+                 f'from="0" to="{w_px:.1f}" begin="{delay:.2f}s" dur="0.40s" '
+                 f'fill="freeze"/></rect></clipPath>')
+        p.append(f'<g clip-path="url(#{cid})">{line}</g>')
+
+    for r, lab in ((1, "mon"), (3, "wed"), (5, "fri")):
+        p.append(label(pad_l - 7, pad_t + r * LH + 10, lab, 9, "m-f", "end"))
+
+    last_m, last_x = None, -999.0
+    base_y = pad_t + 7 * LH + 13
+    for i, w in enumerate(weeks):
+        m = int(w[0]["date"][5:7])
+        x = pad_l + i * (char_width + gap)
+        if m != last_m and i < len(weeks) - 1 and x - last_x >= 34:
+            p.append(label(x, base_y, MON[m - 1], 9, "m-f"))
+            last_x = x
+        last_m = m
+
+    p.append("</svg>")
+    return "".join(p)
+
+
+# ---------------------------------------------------------------- main
+
+def write(path, svg):
+    old = ""
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            old = f.read()
+    if old == svg:
+        return False
+    with open(path, "w", encoding="utf-8") as f:
         f.write(svg)
+    return True
+
+
+def main():
+    token = os.environ.get("GH_PAT")
+    login = "Parin070"
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    os.chdir(out_dir)
+
+    s = summarise(fetch(login, token))
+    files = {"stats.svg": draw_stats(s), "streak.svg": draw_streak(s),
+             "langs.svg": draw_langs(s), "year.svg": draw_year(s)}
+    for word in ("Whoami", "Tech Stack", "Projects", "GitHub Stats"):
+        files[f"hd-{''.join(word.split('-')).lower().replace(' ', '-')}.svg"] = draw_heading(word)
+        # We need specific names: hd-about, hd-stack, hd-projects, hd-stats
+    
+    files["hd-about.svg"] = draw_heading("Whoami")
+    files["hd-stack.svg"] = draw_heading("Tech Stack")
+    files["hd-projects.svg"] = draw_heading("Projects")
+    files["hd-stats.svg"] = draw_heading("GitHub Stats")
+
+    changed = [n for n, svg in files.items()
+               if write(os.path.join(out_dir, n), svg)]
+    print(f"{s['total']} contributions, {s['active']} active days, "
+          f"best week {s['best_week']}, current streak "
+          f"{s['current']['length']}, longest {s['longest']['length']}")
+    print("languages by bytes: "
+          + ", ".join(f"{n} {v}" for n, v in s["by_size"]))
+    print("updated: " + (", ".join(sorted(changed)) if changed else "nothing"))
+
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    download_font()
-    
-    generate_header("hd-about.svg", "Whoami")
-    generate_header("hd-stack.svg", "Tech Stack")
-    generate_header("hd-projects.svg", "Projects")
-    generate_header("hd-stats.svg", "GitHub Stats")
-    
-    # The ascii takes a headshot in the root directory
-    generate_ascii("../headshot.png")
-    
-    data = fetch_github_data()
-    days = generate_stats_and_year(data)
-    generate_streak(days)
-    generate_langs()
-    
-    print("All SVGs generated successfully.")
+    main()
