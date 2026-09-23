@@ -2,7 +2,10 @@
   <img src="./ascii.svg?v=3" alt="ASCII Portrait" width="460" />
   <img src="./stats.svg?v=3" alt="Contributions" width="620" />
   
-  [Website](https://parin-arora.vercel.app) · [GitHub](https://github.com/Parin070) · [LinkedIn](https://www.linkedin.com/in/parinarora) · [Email](mailto:parin.arora33@gmail.com)
+  <a href="https://parin-arora.vercel.app"><img src="https://img.shields.io/badge/Website-161b22?style=plastic&logo=vercel&logoColor=c9d1d9" alt="Website" /></a>
+  <a href="https://github.com/Parin070"><img src="https://img.shields.io/badge/GitHub-161b22?style=plastic&logo=github&logoColor=c9d1d9" alt="GitHub" /></a>
+  <a href="https://www.linkedin.com/in/parinarora"><img src="https://img.shields.io/badge/LinkedIn-161b22?style=plastic&logo=linkedin&logoColor=c9d1d9" alt="LinkedIn" /></a>
+  <a href="mailto:parin.arora33@gmail.com"><img src="https://img.shields.io/badge/Email-161b22?style=plastic&logo=gmail&logoColor=c9d1d9" alt="Email" /></a>
 </div>
 
 <img src="./hd-about.svg?v=3" alt="About" width="620" />
@@ -13,7 +16,31 @@
 
 <img src="./hd-stack.svg?v=3" alt="Stack" width="620" />
 
-<samp>linux &nbsp; wireshark &nbsp; kali-linux &nbsp; docker &nbsp; bash &nbsp; git &nbsp; tor &nbsp; python &nbsp; c++ &nbsp; c &nbsp; java &nbsp; mysql &nbsp; mongodb &nbsp; html5 &nbsp; css3 &nbsp; markdown &nbsp; netlify &nbsp; vercel &nbsp; apache &nbsp; pandas &nbsp; numpy &nbsp; matplotlib &nbsp; windows-terminal</samp>
+<div align="center">
+  <img src="https://img.shields.io/badge/Linux-161b22?style=plastic&logo=linux&logoColor=c9d1d9" alt="Linux" />
+  <img src="https://img.shields.io/badge/Wireshark-161b22?style=plastic&logo=wireshark&logoColor=c9d1d9" alt="Wireshark" />
+  <img src="https://img.shields.io/badge/Kali_Linux-161b22?style=plastic&logo=kalilinux&logoColor=c9d1d9" alt="Kali Linux" />
+  <img src="https://img.shields.io/badge/Docker-161b22?style=plastic&logo=docker&logoColor=c9d1d9" alt="Docker" />
+  <img src="https://img.shields.io/badge/Bash-161b22?style=plastic&logo=gnubash&logoColor=c9d1d9" alt="Bash" />
+  <img src="https://img.shields.io/badge/Git-161b22?style=plastic&logo=git&logoColor=c9d1d9" alt="Git" />
+  <img src="https://img.shields.io/badge/Tor-161b22?style=plastic&logo=torproject&logoColor=c9d1d9" alt="Tor" />
+  <img src="https://img.shields.io/badge/Python-161b22?style=plastic&logo=python&logoColor=c9d1d9" alt="Python" />
+  <img src="https://img.shields.io/badge/C++-161b22?style=plastic&logo=cplusplus&logoColor=c9d1d9" alt="C++" />
+  <img src="https://img.shields.io/badge/C-161b22?style=plastic&logo=c&logoColor=c9d1d9" alt="C" />
+  <img src="https://img.shields.io/badge/Java-161b22?style=plastic&logo=openjdk&logoColor=c9d1d9" alt="Java" />
+  <img src="https://img.shields.io/badge/MySQL-161b22?style=plastic&logo=mysql&logoColor=c9d1d9" alt="MySQL" />
+  <img src="https://img.shields.io/badge/MongoDB-161b22?style=plastic&logo=mongodb&logoColor=c9d1d9" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/HTML5-161b22?style=plastic&logo=html5&logoColor=c9d1d9" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-161b22?style=plastic&logo=css3&logoColor=c9d1d9" alt="CSS3" />
+  <img src="https://img.shields.io/badge/Markdown-161b22?style=plastic&logo=markdown&logoColor=c9d1d9" alt="Markdown" />
+  <img src="https://img.shields.io/badge/Netlify-161b22?style=plastic&logo=netlify&logoColor=c9d1d9" alt="Netlify" />
+  <img src="https://img.shields.io/badge/Vercel-161b22?style=plastic&logo=vercel&logoColor=c9d1d9" alt="Vercel" />
+  <img src="https://img.shields.io/badge/Apache-161b22?style=plastic&logo=apache&logoColor=c9d1d9" alt="Apache" />
+  <img src="https://img.shields.io/badge/Pandas-161b22?style=plastic&logo=pandas&logoColor=c9d1d9" alt="Pandas" />
+  <img src="https://img.shields.io/badge/NumPy-161b22?style=plastic&logo=numpy&logoColor=c9d1d9" alt="NumPy" />
+  <img src="https://img.shields.io/badge/Matplotlib-161b22?style=plastic&logo=matplotlib&logoColor=c9d1d9" alt="Matplotlib" />
+  <img src="https://img.shields.io/badge/Windows_Terminal-161b22?style=plastic&logo=windowsterminal&logoColor=c9d1d9" alt="Windows Terminal" />
+</div>
 
 <img src="./hd-projects.svg?v=3" alt="Projects" width="620" />
 

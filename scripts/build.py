@@ -382,7 +382,7 @@ def draw_year(s):
     
     H = int(pad_t + 7 * LH + 26)
     
-    colors = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"]
+    colors = ["#161b22", "#30363d", "#6e7681", "#c9d1d9", "#ffffff"]
     max_count = 1
     for w in weeks:
         for d in w:
