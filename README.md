@@ -41,6 +41,7 @@
   <img src="https://img.shields.io/badge/Matplotlib-161b22?style=plastic&logo=matplotlib&logoColor=c9d1d9" alt="Matplotlib" />
   <img src="https://img.shields.io/badge/Windows_Terminal-161b22?style=plastic&logo=windowsterminal&logoColor=c9d1d9" alt="Windows Terminal" />
 </div>
+<br>
 
 <img src="./hd-projects.svg?v=4" alt="Projects" width="620" />
 
