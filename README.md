@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="./ascii.svg?v=3" alt="ASCII Portrait" width="460" />
-  <img src="./stats.svg?v=3" alt="Contributions" width="620" />
+  <img src="./ascii.svg?v=4" alt="ASCII Portrait" width="460" />
+  <img src="./stats.svg?v=4" alt="Contributions" width="620" />
   
   <a href="https://parin-arora.vercel.app"><img src="https://img.shields.io/badge/Website-161b22?style=plastic&logo=vercel&logoColor=c9d1d9" alt="Website" /></a>
   <a href="https://github.com/Parin070"><img src="https://img.shields.io/badge/GitHub-161b22?style=plastic&logo=github&logoColor=c9d1d9" alt="GitHub" /></a>
@@ -8,13 +8,13 @@
   <a href="mailto:parin.arora33@gmail.com"><img src="https://img.shields.io/badge/Email-161b22?style=plastic&logo=gmail&logoColor=c9d1d9" alt="Email" /></a>
 </div>
 
-<img src="./hd-about.svg?v=3" alt="About" width="620" />
+<img src="./hd-about.svg?v=4" alt="About" width="620" />
 
 > Third-year B.E. Computer Science student at BITS Pilani Dubai Campus, based in Dubai.<br>
 > Interested in SOC/Blue Team work short-term, AI security (purple teaming) as long-term direction, and binary exploitation/pwn as a long game.<br>
 > Currently building CS Head role at IEI BPDC Student Chapter Council and VP of LUG BITS Dubai.
 
-<img src="./hd-stack.svg?v=3" alt="Stack" width="620" />
+<img src="./hd-stack.svg?v=4" alt="Stack" width="620" />
 
 <div align="center">
   <img src="https://img.shields.io/badge/Linux-161b22?style=plastic&logo=linux&logoColor=c9d1d9" alt="Linux" />
@@ -42,7 +42,7 @@
   <img src="https://img.shields.io/badge/Windows_Terminal-161b22?style=plastic&logo=windowsterminal&logoColor=c9d1d9" alt="Windows Terminal" />
 </div>
 
-<img src="./hd-projects.svg?v=3" alt="Projects" width="620" />
+<img src="./hd-projects.svg?v=4" alt="Projects" width="620" />
 
 ### [GhostMap](https://github.com/Parin070/GhostMap) &nbsp;·&nbsp; <samp>osint, cli</samp>
 OSINT CLI tool aiming to simplify bug bounty and pentesting recon phase.
@@ -53,17 +53,17 @@ Homelab attack-defend setup using the Cowrie SSH/Telnet honeypot.
 ### [VAULT](https://github.com/Parin070/VAULT) &nbsp;·&nbsp; <samp>ctf, writeups</samp>
 CTF writeups site.
 
-<img src="./hd-stats.svg?v=3" alt="Stats" width="620" />
+<img src="./hd-stats.svg?v=4" alt="Stats" width="620" />
 <div align="center">
-  <img src="./streak.svg?v=3" alt="Streak" />
-  <img src="./langs.svg?v=3" alt="Languages" />
-  <img src="./year.svg?v=3" alt="Year Activity" />
+  <img src="./streak.svg?v=4" alt="Streak" />
+  <img src="./langs.svg?v=4" alt="Languages" />
+  <img src="./year.svg?v=4" alt="Year Activity" />
 </div>
 
-Every graphic here is generated, not embedded from anyone else's server. ascii.svg?v=3 is a photo pushed through a character ramp by [scripts/build.py](https://github.com/Parin070/Parin070/blob/main/scripts/build.py); the stat graphics and these section headings are drawn by [a scheduled action](https://github.com/Parin070/Parin070/blob/main/.github/workflows/stats.yml) straight from the GitHub GraphQL API, once a day, committing only what changed.
+Every graphic here is generated, not embedded from anyone else's server. ascii.svg?v=4 is a photo pushed through a character ramp by [scripts/build.py](https://github.com/Parin070/Parin070/blob/main/scripts/build.py); the stat graphics and these section headings are drawn by [a scheduled action](https://github.com/Parin070/Parin070/blob/main/.github/workflows/stats.yml) straight from the GitHub GraphQL API, once a day, committing only what changed.
 
 They animate with SMIL inside the SVG, because GitHub strips scripts from READMEs — and since nothing loads from a third party, nothing here can rate-limit or go dark. The headings are SVGs for the same reason: GitHub also strips CSS, so an image is the only way to put this page's own typeface on them.
 
 The typeface is [JetBrains Mono](https://github.com/Parin070/Parin070/tree/main/scripts), subset to just the characters each graphic draws and inlined as base64. That isn't only for looks: the portrait's grid assumes an advance width of exactly 0.600 em, and a viewer whose default monospace is narrower would otherwise see it squeezed.
 
-Language totals cover public repositories only. year.svg?v=3 renders native colored heatmap blocks for contribution intensity.
+Language totals cover public repositories only. year.svg?v=4 renders native colored heatmap blocks for contribution intensity.
