@@ -48,10 +48,10 @@
 ### [GhostMap](https://github.com/Parin070/GhostMap) &nbsp;·&nbsp; <samp>osint, cli</samp>
 OSINT CLI tool aiming to simplify bug bounty and pentesting recon phase.
 
-### [Cowrie honeypot](https://github.com/Parin070/Cowrie) &nbsp;·&nbsp; <samp>honeypot, defense</samp>
+### [Cowrie honeypot](https://github.com/Parin070/Cowrie-Honeypot-Lab) &nbsp;·&nbsp; <samp>honeypot, defense</samp>
 Homelab attack-defend setup using the Cowrie SSH/Telnet honeypot.
 
-### [VAULT](https://github.com/Parin070/VAULT) &nbsp;·&nbsp; <samp>ctf, writeups</samp>
+### [VAULT](https://parin070.github.io/Write-Ups/) &nbsp;·&nbsp; <samp>ctf, writeups</samp>
 CTF writeups site.
 
 <img src="./hd-stats.svg?v=4" alt="Stats" width="620" />
