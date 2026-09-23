@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./ascii.svg?v=4" alt="ASCII Portrait" width="460" />
+  <img src="./ascii.svg?v=5" alt="ASCII Portrait" />
   <img src="./stats.svg?v=4" alt="Contributions" width="620" />
   
   <a href="https://parin-arora.vercel.app"><img src="https://img.shields.io/badge/Website-161b22?style=plastic&logo=vercel&logoColor=c9d1d9" alt="Website" /></a>

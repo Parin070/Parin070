@@ -130,7 +130,7 @@ def build_svg(lines, cols=COLS):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("photo")
-    ap.add_argument("out", nargs="?", default="../ascii.svg")
+    ap.add_argument("out", nargs="?", default="ascii.svg")
     ap.add_argument("--crop", help="left,top,right,bottom")
     ap.add_argument("--cols", type=int, default=COLS)
     ap.add_argument("--preview", action="store_true",
